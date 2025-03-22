@@ -1,45 +1,53 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-import { Code, Send } from "lucide-react"
+import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Code, Send } from "lucide-react";
+import { LiveCard } from '@/components/ui/LiveCard'; // LiveCard コンポーネントをインポート
 
 export default function ViewerPage() {
-  const router = useRouter()
-  const [message, setMessage] = useState("")
+  const router = useRouter();
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([
     { user: "システム", text: "ライブ配信が開始されました" },
     { user: "ユーザー1", text: "こんにちは！今日はどんな問題を解きますか？" },
     { user: "ドライバー", text: "今日はABC123のC問題から始めます" },
-  ])
-
+  ]);
   const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (message.trim()) {
-      setMessages([...messages, { user: "あなた", text: message }])
-      setMessage("")
+      setMessages([...messages, { user: "あなた", text: message }]);
+      setMessage("");
     }
-  }
+  };
 
   const switchToDriver = () => {
-    router.push("/driver")
-  }
+    router.push("/driver");
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#f8f9fa] to-[#e9f2e9]">
       <header className="bg-white border-b border-[#4D7C4D] p-4 shadow-sm">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Image src="/images/logo.png" alt="アンタオサウルス" width={40} height={40} className="rounded-full" />
-            <h1 className="text-xl font-bold text-[#4D7C4D]">アンタオサウルス</h1>
+            <Image
+              src="/images/logo.png"
+              alt="アンタオサウルス"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+            <h1 className="text-xl font-bold text-[#4D7C4D]">
+              アンタオサウルス
+            </h1>
           </div>
           <Button
             variant="outline"
@@ -53,27 +61,7 @@ export default function ViewerPage() {
 
       <main className="flex-1 container mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3">
-          <Card className="border-[#4D7C4D] overflow-hidden">
-            <div className="relative">
-              <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                <span className="live-badge">LIVE</span>
-                <span className="text-white text-sm font-medium bg-black/50 px-2 py-1 rounded">視聴者 12人</span>
-              </div>
-              <div className="bg-[#0A5E5C] aspect-video flex items-center justify-center">
-                <div className="text-center text-white">
-                  <p className="text-2xl font-semibold">ライブ動画</p>
-                  <p className="text-gray-200">コンポーネント</p>
-                </div>
-              </div>
-            </div>
-            <CardContent className="p-4 bg-white">
-              <h2 className="text-xl font-bold text-[#4D7C4D]">ABC123の問題を解く</h2>
-              <div className="flex items-center gap-2 mt-2">
-                <Image src="/images/logo.png" alt="アンタオサウルス" width={24} height={24} className="rounded-full" />
-                <span className="text-sm font-medium">ドライバー名</span>
-              </div>
-            </CardContent>
-          </Card>
+          <LiveCard />
         </div>
 
         <div className="space-y-4 lg:col-span-1">
@@ -103,9 +91,13 @@ export default function ViewerPage() {
               <ScrollArea className="h-[300px] pr-4">
                 {messages.map((msg, index) => (
                   <div key={index} className="mb-4">
-                    <div className="font-semibold text-[#0A5E5C]">{msg.user}</div>
+                    <div className="font-semibold text-[#0A5E5C]">
+                      {msg.user}
+                    </div>
                     <div className="text-sm">{msg.text}</div>
-                    {index < messages.length - 1 && <Separator className="mt-2 bg-[#B5D267]" />}
+                    {index < messages.length - 1 && (
+                      <Separator className="mt-2 bg-[#B5D267]" />
+                    )}
                   </div>
                 ))}
               </ScrollArea>
@@ -117,7 +109,11 @@ export default function ViewerPage() {
                   onChange={(e) => setMessage(e.target.value)}
                   className="border-[#B5D267] focus-visible:ring-[#4D7C4D]"
                 />
-                <Button type="submit" size="icon" className="bg-[#FFBA0D] hover:bg-[#e6a700] text-white">
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="bg-[#FFBA0D] hover:bg-[#e6a700] text-white"
+                >
                   <Send size={18} />
                 </Button>
               </form>
@@ -130,6 +126,5 @@ export default function ViewerPage() {
         アンタオサウルス © 2025
       </footer>
     </div>
-  )
+  );
 }
-
