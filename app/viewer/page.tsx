@@ -12,6 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Code, Send } from "lucide-react";
 import { LiveCard } from '@/components/ui/LiveCard'; // LiveCard コンポーネントをインポート
+import { tree } from "next/dist/build/templates/app-page";
 
 export default function ViewerPage() {
   const router = useRouter();
@@ -61,7 +62,7 @@ export default function ViewerPage() {
 
       <main className="flex-1 container mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3">
-          <LiveCard />
+          <LiveCard showUpdateForm={true} showStopStreamingForm={true} />
         </div>
 
         <div className="space-y-4 lg:col-span-1">

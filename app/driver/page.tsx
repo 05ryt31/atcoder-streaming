@@ -63,7 +63,7 @@ export default function DriverPage() {
 
       <main className="flex-1 container mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3 space-y-4">
-        <LiveCard />
+        <LiveCard showUpdateForm={false} showStopStreamingForm={false} />
 
           <Card className="border-[#B5D267]">
             <CardHeader className="bg-[#4D7C4D] text-white pb-2">
