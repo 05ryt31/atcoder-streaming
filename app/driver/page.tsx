@@ -300,7 +300,7 @@ export default function DriverPage() {
             </Card>
           )}
 
-        <LiveCard showUpdateForm={false} showStopStreamingForm={false} />
+        <LiveCard showUpdateForm={true} showStopStreamingForm={true} />
           <Card className="border-[#B5D267]">
             <CardHeader className="bg-[#4D7C4D] text-white pb-2">
               <CardTitle className="flex items-center gap-2 text-lg">

@@ -62,7 +62,7 @@ export default function ViewerPage() {
 
       <main className="flex-1 container mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3">
-          <LiveCard showUpdateForm={true} showStopStreamingForm={true} />
+          <LiveCard showUpdateForm={false} showStopStreamingForm={false} />
         </div>
 
         <div className="space-y-4 lg:col-span-1">
