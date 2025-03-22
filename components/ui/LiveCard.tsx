@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image"; // Next.js の Image コンポーネントを使用する場合
 
 // YouTubeのURLからライブ動画のIDを抽出する関数（/live/ パターンのみ対応）
 const extractLiveVideoId = (url: string): string | null => {
-  const regExp = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/live\/([a-zA-Z0-9_-]{11})/;
+  const regExp =
+    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/live\/([a-zA-Z0-9_-]{11})/;
   const match = url.match(regExp);
   return match ? match[1] : null;
 };
@@ -55,7 +56,13 @@ const LiveCard: React.FC = () => {
       <div className="relative">
         {/* オーバーレイ部分：LIVEバッジ */}
         <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-          <span className="live-badge">LIVE</span>
+          <span
+            className={`live-badge ${
+              videoId ? "bg-red-600 text-white" : "!bg-gray-500 text-white"
+            }`}
+          >
+            LIVE
+          </span>
         </div>
         {/* YouTube動画の埋め込み部分：動画IDがあればiframe、なければ灰色背景 */}
         <div className="aspect-video flex items-center justify-center">
@@ -70,7 +77,7 @@ const LiveCard: React.FC = () => {
             ></iframe>
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gray-500">
-              <p className="text-white text-xl">ここにライブ動画</p>
+              <p className="text-white text-xl">下のフォームにライブ動画のURLを入れてください</p>
             </div>
           )}
         </div>
@@ -104,7 +111,8 @@ const LiveCard: React.FC = () => {
             <button
               type="button"
               onClick={handleStopStreaming}
-              className="ml-2 inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none"
+              disabled={!videoId}
+              className="ml-2 inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             >
               配信をやめる
             </button>
