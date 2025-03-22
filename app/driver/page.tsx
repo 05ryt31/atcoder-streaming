@@ -14,6 +14,8 @@ import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Code, Send, Video, Users, BookOpen } from "lucide-react"
 import { LiveCard } from '@/components/ui/LiveCard'; // LiveCard コンポーネントをインポート
+import { Message } from "@/components/ui/props";
+import { fetchComments } from "@/handlers/fetchComments";
 
 interface Problem {
   id: string;
@@ -70,10 +72,7 @@ export default function DriverPage() {
   const [problemId, setProblemId] = useState("abc123_c")
   const [isLive, setIsLive] = useState(false)
   const [message, setMessage] = useState("")
-  const [messages, setMessages] = useState([
-    { user: "システム", text: "配信の準備ができました" },
-    { user: "ユーザー1", text: "こんにちは！今日はどんな問題を解きますか？" },
-  ])
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const [problems, setProblems] = useState<DetailedProblem[]>([])
   const [problemDifficulties, setProblemDifficulties] = useState<Record<string, ProblemModel>>({})
@@ -115,13 +114,21 @@ export default function DriverPage() {
         }
       } catch (error) {
         console.error("問題のデータの取得に失敗しました:", error);
-        setMessages([...messages, { user: "システム", text: "AtCoder Problemsからの問題取得に失敗しました。"}]);
+        setMessages([...messages, { user: "システム", message: "AtCoder Problemsからの問題取得に失敗しました。"}]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
+
+    const fetchCommentData = async () => {
+      const result = await fetchComments('https://mobpro-api.taketo-u.net/messages/qWjlNO');
+      if (result) {
+        setMessages(result.messages); // 取得したメッセージをセット
+      }
+    };
+    fetchCommentData();
   }, []);
 
   useEffect(() => {
@@ -141,7 +148,7 @@ export default function DriverPage() {
         ...messages,
         {
           user: "システム",
-          text: `問題『${problem.name}』が選択されました。難易度: ${
+          message: `問題『${problem.name}』が選択されました。難易度: ${
             problemDifficulties[problem.id]?.difficulty
               ? Math.floor(problemDifficulties[problem.id].difficulty!)
               : "不明"
@@ -154,7 +161,7 @@ export default function DriverPage() {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
     if (message.trim()) {
-      setMessages([...messages, { user: "ドライバー", text: message }])
+      setMessages([...messages, { user: "ドライバー", message: message }])
       setMessage("")
     }
   }
@@ -361,7 +368,7 @@ int main() {
                 {messages.map((msg, index) => (
                   <div key={index} className="mb-4">
                     <div className="font-semibold text-[#0A5E5C]">{msg.user}</div>
-                    <div className="text-sm">{msg.text}</div>
+                    <div className="text-sm">{msg.message}</div>
                     {index < messages.length - 1 && <Separator className="mt-2 bg-[#B5D267]" />}
                   </div>
                 ))}

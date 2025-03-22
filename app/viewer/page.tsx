@@ -22,7 +22,7 @@ export default function ViewerPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await fetchComments('https://mobpro-apiii.taketo-u.net/messages/qWjlNO');
+      const result = await fetchComments('https://mobpro-api.taketo-u.net/messages/qWjlNO');
       if (result) {
         setMessages(result.messages); // 取得したメッセージをセット
       }
