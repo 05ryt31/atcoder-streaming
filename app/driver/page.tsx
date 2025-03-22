@@ -13,6 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Code, Send, Video, Users, BookOpen } from "lucide-react"
+import { LiveCard } from '@/components/ui/LiveCard'; // LiveCard コンポーネントをインポート
 
 interface Problem {
   id: string;
@@ -299,15 +300,7 @@ export default function DriverPage() {
             </Card>
           )}
 
-          <Card className="border-[#B5D267] overflow-hidden">
-            <div className="bg-[#0A5E5C] aspect-video flex items-center justify-center">
-              <div className="text-center text-white">
-                <p className="text-2xl font-semibold">配信プレビュー</p>
-                <p className="text-gray-200">{isLive ? "ライブ配信中" : "配信準備中"}</p>
-              </div>
-            </div>
-          </Card>
-
+        <LiveCard showUpdateForm={false} showStopStreamingForm={false} />
           <Card className="border-[#B5D267]">
             <CardHeader className="bg-[#4D7C4D] text-white pb-2">
               <CardTitle className="flex items-center gap-2 text-lg">

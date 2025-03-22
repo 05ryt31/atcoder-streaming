@@ -8,7 +8,6 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata = {
   title: "AtCoder ライブ配信プラットフォーム",
   description: "AtCoderの競技プログラミングをライブ配信するプラットフォーム",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
