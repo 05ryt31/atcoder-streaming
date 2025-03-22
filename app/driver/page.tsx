@@ -81,6 +81,8 @@ export default function DriverPage() {
   const [problemStatement, setProblemStatement] = useState("")
 
   const apiClient = new AtCoderProblemsClient()
+  const roomId = 1; // ← 今は固定値。将来的に状態や選択から取得する
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -123,10 +125,13 @@ export default function DriverPage() {
     fetchData();
 
     const fetchCommentData = async () => {
-      const result = await fetchComments('https://mobpro-api.taketo-u.net/messages/qWjlNO');
-      if (result) {
-        setMessages(result.messages); // 取得したメッセージをセット
+      const result = await fetchComments('https://mobpro-api.taketo-u.net/messages/1');
+      if (result && Array.isArray(result)) {
+        setMessages(result);
+      } else {
+        console.warn("コメントデータの取得に失敗したか、形式が不正です: ", result);
       }
+      
     };
     fetchCommentData();
   }, []);
@@ -158,18 +163,53 @@ export default function DriverPage() {
     }
   }, [problemId]);
 
+  
   // ユーザーをSetでユニークにし、その後配列に変換
   const uniqueUsers = new Set(messages.map(item => item.user));
   // Setを配列に変換
   const newUniqueUsers = [...uniqueUsers];
+  
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (message.trim()) {
-      setMessages([...messages, { user: "ドライバー", message: message }])
-      setMessage("")
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+  
+    const newMessage = {
+      user: "ドライバー", // ← 必要なら state にしてもOK
+      message: message,
+    };
+  
+    try {
+      const res = await fetch(`https://mobpro-api.taketo-u.net/messages/make/${roomId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newMessage),
+      });
+  
+      if (!res.ok) {
+        throw new Error("コメント送信に失敗しました");
+      }
+  
+      const savedMessage = await res.json();
+  
+      setMessages([...messages, {
+        user: savedMessage.user,
+        message: savedMessage.message
+      }]);
+  
+      setMessage(""); // 入力欄をクリア
+  
+    } catch (error) {
+      console.error("コメントの送信に失敗しました:", error);
+      setMessages([...messages, {
+        user: "システム",
+        message: "コメントの送信に失敗しました。"
+      }]);
     }
-  }
+  };
+  
 
   const switchToViewer = () => {
     router.push("/viewer")
