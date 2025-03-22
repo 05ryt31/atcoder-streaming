@@ -158,6 +158,11 @@ export default function DriverPage() {
     }
   }, [problemId]);
 
+  // ユーザーをSetでユニークにし、その後配列に変換
+  const uniqueUsers = new Set(messages.map(item => item.user));
+  // Setを配列に変換
+  const newUniqueUsers = [...uniqueUsers];
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
     if (message.trim()) {
@@ -340,20 +345,15 @@ int main() {
             <CardHeader className="bg-[#4D7C4D] text-white pb-2">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Users size={20} />
-                視聴者 (12人)
+                視聴者 ({newUniqueUsers.length}人)
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
               <ScrollArea className="h-[200px]">
                 <div className="space-y-2">
-                  <div className="text-sm">ユーザー1</div>
-                  <div className="text-sm">ユーザー2</div>
-                  <div className="text-sm">ユーザー3</div>
-                  <div className="text-sm">ユーザー4</div>
-                  <div className="text-sm">ユーザー5</div>
-                  <div className="text-sm">ユーザー6</div>
-                  <div className="text-sm">ユーザー7</div>
-                  <div className="text-sm">ユーザー8</div>
+                {newUniqueUsers.map((viewer, index) => (
+                  <div key={index} className="text-sm">{viewer}</div>
+                ))}
                 </div>
               </ScrollArea>
             </CardContent>
