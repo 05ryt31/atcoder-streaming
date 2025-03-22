@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -12,20 +12,28 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Code, Send } from "lucide-react";
 import { LiveCard } from '@/components/ui/LiveCard'; // LiveCard コンポーネントをインポート
-import { tree } from "next/dist/build/templates/app-page";
+import { Message } from "@/components/ui/props";
+import { fetchComments } from "@/handlers/fetchComments";
 
 export default function ViewerPage() {
   const router = useRouter();
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    { user: "システム", text: "ライブ配信が開始されました" },
-    { user: "ユーザー1", text: "こんにちは！今日はどんな問題を解きますか？" },
-    { user: "ドライバー", text: "今日はABC123のC問題から始めます" },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await fetchComments('https://mobpro-apiii.taketo-u.net/messages/qWjlNO');
+      if (result) {
+        setMessages(result.messages); // 取得したメッセージをセット
+      }
+    };
+    fetchData();
+  }, []);
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim()) {
-      setMessages([...messages, { user: "あなた", text: message }]);
+      setMessages([...messages, { user: "あなた", message: message }]);
       setMessage("");
     }
   };
@@ -95,7 +103,7 @@ export default function ViewerPage() {
                     <div className="font-semibold text-[#0A5E5C]">
                       {msg.user}
                     </div>
-                    <div className="text-sm">{msg.text}</div>
+                    <div className="text-sm">{msg.message}</div>
                     {index < messages.length - 1 && (
                       <Separator className="mt-2 bg-[#B5D267]" />
                     )}
