@@ -13,6 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Code, Send, Video, Users } from "lucide-react"
+import { LiveCard } from '@/components/ui/LiveCard'; // LiveCard コンポーネントをインポート
 
 export default function DriverPage() {
   const router = useRouter()
@@ -62,60 +63,7 @@ export default function DriverPage() {
 
       <main className="flex-1 container mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3 space-y-4">
-          <Card className="border-[#B5D267]">
-            <CardHeader className="bg-[#4D7C4D] text-white pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Video size={20} />
-                配信設定
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-[#0A5E5C]">配信タイトル</label>
-                  <Input
-                    value={streamTitle}
-                    onChange={(e) => setStreamTitle(e.target.value)}
-                    placeholder="配信タイトルを入力"
-                    className="border-[#B5D267] focus-visible:ring-[#4D7C4D]"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-[#0A5E5C]">問題ID</label>
-                  <Select value={problemId} onValueChange={setProblemId}>
-                    <SelectTrigger className="border-[#B5D267] focus:ring-[#4D7C4D]">
-                      <SelectValue placeholder="問題を選択" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="abc123_a">ABC123 - A問題</SelectItem>
-                      <SelectItem value="abc123_b">ABC123 - B問題</SelectItem>
-                      <SelectItem value="abc123_c">ABC123 - C問題</SelectItem>
-                      <SelectItem value="abc123_d">ABC123 - D問題</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button
-                  onClick={toggleLiveStatus}
-                  className={
-                    isLive ? "bg-red-500 hover:bg-red-600 text-white" : "bg-[#FFBA0D] hover:bg-[#e6a700] text-white"
-                  }
-                >
-                  {isLive ? "配信を終了する" : "配信を開始する"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-[#B5D267] overflow-hidden">
-            <div className="bg-[#0A5E5C] aspect-video flex items-center justify-center">
-              <div className="text-center text-white">
-                <p className="text-2xl font-semibold">配信プレビュー</p>
-                <p className="text-gray-200">{isLive ? "ライブ配信中" : "配信準備中"}</p>
-              </div>
-            </div>
-          </Card>
+        <LiveCard showUpdateForm={false} showStopStreamingForm={false} />
 
           <Card className="border-[#B5D267]">
             <CardHeader className="bg-[#4D7C4D] text-white pb-2">
