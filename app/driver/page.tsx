@@ -311,33 +311,7 @@ export default function DriverPage() {
               </CardContent>
             </Card>
           )}
-
-        <LiveCard showUpdateForm={true} showStopStreamingForm={true} />
-          <Card className="border-[#B5D267]">
-            <CardHeader className="bg-[#4D7C4D] text-white pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Code size={20} />
-                コードエディタ
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <Textarea
-                className="font-mono h-[200px] border-[#B5D267] focus-visible:ring-[#4D7C4D]"
-                placeholder="ここにコードを入力..."
-                defaultValue={`#include <iostream>
-using namespace std;
-
-int main() {
-  int N;
-  cin >> N;
-  
-  // ここにコードを書く
-  
-  return 0;
-}`}
-              />
-            </CardContent>
-          </Card>
+          <LiveCard showUpdateForm={true} showStopStreamingForm={true} />
         </div>
 
         <div className="space-y-4 lg:col-span-1">
