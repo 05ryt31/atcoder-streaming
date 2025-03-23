@@ -3,12 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CommentCard from "@/components/ui/CommentCard";
 import { Code, Send } from "lucide-react";
 import { LiveCard } from '@/components/ui/LiveCard';
 import { Message } from "@/components/ui/props";
 import { fetchComments } from "@/handlers/fetchComments";
 import ProblemContent from "@/components/ui/problem-content";
+import { ScrollArea } from "@/components/ui/scroll-area"; // Added this import
+import { Separator } from "@/components/ui/separator"; // Added this import
 
 interface ProblemDetail {
   id: string;
@@ -132,21 +137,20 @@ export default function ViewerPage() {
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#f8f9fa] to-[#e9f2e9]">
       <header className="bg-white border-b border-[#4D7C4D] p-2 shadow-sm">
         <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Image
-              src="/images/logo.png"
-              alt="アンタオサウルス"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
-            <h1 className="text-[min(9vw,60px)] font-bold text-[#4D7C4D]">
-              Live Coders
-              <span className="block mt-1 text-[min(2vw,20px)] text-gray-600">
-                視聴者ーモード
-              </span>
-            </h1>
-          </div>
+          <Image
+            src="/images/logo.png"
+            alt="アンタオサウルス"
+            width={40}
+            height={40}
+            className="rounded-full"
+            priority
+          />
+          <h1 className="text-[min(9vw,60px)] font-bold text-[#4D7C4D]">
+            Live Coders
+            <span className="block mt-1 text-[min(2vw,20px)] text-gray-600">
+              視聴者ーモード
+            </span>
+          </h1>
           <Button
             variant="outline"
             onClick={switchToDriver}
