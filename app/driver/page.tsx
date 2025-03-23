@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Code, Send, Video, Users, BookOpen } from "lucide-react"
+import { Send, Video, Users, BookOpen } from "lucide-react"
 import { LiveCard } from '@/components/ui/LiveCard'; // LiveCard コンポーネントをインポート
 import { Message } from "@/components/ui/props";
 import { fetchComments } from "@/handlers/fetchComments";
@@ -380,7 +380,7 @@ export default function DriverPage() {
             <CardContent className="p-4">
               <ScrollArea className="h-[300px] pr-4">
                 {messages.map((msg, index) => (
-                  <div key={index} className="mb-4">
+                  <div key={index} className="mb-4" style={{ whiteSpace: 'pre-line' }}>
                     <div className="font-semibold text-[#0A5E5C]">{msg.user}</div>
                     <div className="text-sm">{msg.message}</div>
                     {index < messages.length - 1 && <Separator className="mt-2 bg-[#B5D267]" />}
@@ -389,7 +389,7 @@ export default function DriverPage() {
               </ScrollArea>
 
               <form onSubmit={handleSendMessage} className="mt-4 flex gap-2">
-                <Input
+                <Textarea
                   placeholder="メッセージを入力..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
