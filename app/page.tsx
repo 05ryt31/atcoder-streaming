@@ -21,6 +21,8 @@ export default function LoginPage() {
     e.preventDefault()
 
     // 実際のアプリケーションでは認証ロジックを実装します
+    //getuser/useridとか使って認証もどきできる
+    //getuser/
     // ここではシンプルにリダイレクトのみ行います
     if (userType === "driver") {
       router.push("/driver")

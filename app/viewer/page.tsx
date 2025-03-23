@@ -1,21 +1,17 @@
 "use client";
 
-import type React from "react";
-
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea"
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Code, Send } from "lucide-react";
-import { LiveCard } from '@/components/ui/LiveCard'; // LiveCard コンポーネントをインポート
-import { Message } from "@/components/ui/props";
+import { LiveCard } from "@/components/ui/LiveCard";
+import type { Message } from "@/components/ui/props";
 import { fetchComments } from "@/handlers/fetchComments";
+import CommentCard from "@/components/ui/CommentCard";
 
-const roomId = 1; // ← 今は固定値。将来的に状態や選択から取得する
+const roomId = 1;
 
 export default function ViewerPage() {
   const router = useRouter();
@@ -24,7 +20,7 @@ export default function ViewerPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await fetchComments('https://mobpro-api.taketo-u.net/messages/1');
+      const result = await fetchComments("https://mobpro-api.taketo-u.net/messages/1");
       if (result && Array.isArray(result)) {
         setMessages(result);
       } else {
@@ -35,52 +31,60 @@ export default function ViewerPage() {
   }, []);
 
   const handleSendMessage = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!message.trim()) return;
-    
-      const newMessage = {
-        user: "ドライバー", // ← 必要なら state にしてもOK
-        message: message,
-      };
-    
-      try {
-        const res = await fetch(`https://mobpro-api.taketo-u.net/messages/make/${roomId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newMessage),
-        });
-    
-        if (!res.ok) {
-          throw new Error("コメント送信に失敗しました");
-        }
-    
-        const savedMessage = await res.json();
-    
-        setMessages([...messages, {
-          user: savedMessage.user,
-          message: savedMessage.message
-        }]);
-    
-        setMessage(""); // 入力欄をクリア
-    
-      } catch (error) {
-        console.error("コメントの送信に失敗しました:", error);
-        setMessages([...messages, {
-          user: "システム",
-          message: "コメントの送信に失敗しました。"
-        }]);
-      }
+    e.preventDefault();
+    if (!message.trim()) return;
+  
+    // localStorageからユーザー名を取得。保存されていない場合はデフォルトで"匿名"とする
+    const currentUser = localStorage.getItem("username") || "匿名";
+  
+    const newMessage = {
+      user: currentUser,
+      message: message,
     };
-
+  
+    try {
+      const res = await fetch(`https://mobpro-api.taketo-u.net/messages/make/${roomId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newMessage),
+      });
+  
+      if (!res.ok) {
+        throw new Error("コメント送信に失敗しました");
+      }
+  
+      const savedMessage = await res.json();
+  
+      setMessages([
+        ...messages,
+        {
+          user: savedMessage.user,
+          message: savedMessage.message,
+        },
+      ]);
+  
+      setMessage(""); // 入力欄をクリア
+    } catch (error) {
+      console.error("コメントの送信に失敗しました:", error);
+      setMessages([
+        ...messages,
+        {
+          user: "システム",
+          message: "コメントの送信に失敗しました。",
+        },
+      ]);
+    }
+  };
+  
   const switchToDriver = () => {
     router.push("/driver");
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#f8f9fa] to-[#e9f2e9]">
-      <header className="bg-white border-b border-[#4D7C4D] p-4 shadow-sm">
+      <header className="bg-white border-b border-[#4D7C4D] p-2 shadow-sm">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Image
@@ -90,8 +94,11 @@ export default function ViewerPage() {
               height={40}
               className="rounded-full"
             />
-            <h1 className="text-xl font-bold text-[#4D7C4D]">
-              アンタオサウルス
+            <h1 className="text-[min(9vw,60px)] font-bold text-[#4D7C4D]">
+              Live Coders
+              <span className="block mt-1 text-[min(2vw,20px)] text-gray-600">
+                視聴者ーモード
+              </span>
             </h1>
           </div>
           <Button
@@ -128,42 +135,14 @@ export default function ViewerPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-[#B5D267]">
-            <CardHeader className="bg-[#4D7C4D] text-white pb-2">
-              <CardTitle className="text-lg">コメント</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <ScrollArea className="h-[300px] pr-4">
-                {messages.map((msg, index) => (
-                  <div key={index} className="mb-4" style={{ whiteSpace: 'pre-line' }}>
-                    <div className="font-semibold text-[#0A5E5C]">
-                      {msg.user}
-                    </div>
-                    <div className="text-sm">{msg.message}</div>
-                    {index < messages.length - 1 && (
-                      <Separator className="mt-2 bg-[#B5D267]" />
-                    )}
-                  </div>
-                ))}
-              </ScrollArea>
-
-              <form onSubmit={handleSendMessage} className="mt-4 flex gap-2">
-                <Textarea
-                  placeholder="メッセージを入力..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="border-[#B5D267] focus-visible:ring-[#4D7C4D]"
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  className="bg-[#FFBA0D] hover:bg-[#e6a700] text-white"
-                >
-                  <Send size={18} />
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+          {/* CommentCard にユーザー名が含まれたコメントを反映させる */}
+          <CommentCard
+            messages={messages}
+            message={message}
+            setMessage={setMessage}
+            handleSendMessage={handleSendMessage}
+            showHeart={true}
+          />
         </div>
       </main>
 
