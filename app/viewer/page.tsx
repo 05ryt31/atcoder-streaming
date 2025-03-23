@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Code, Send } from "lucide-react";
@@ -135,7 +135,7 @@ export default function ViewerPage() {
             <CardContent className="p-4">
               <ScrollArea className="h-[300px] pr-4">
                 {messages.map((msg, index) => (
-                  <div key={index} className="mb-4">
+                  <div key={index} className="mb-4" style={{ whiteSpace: 'pre-line' }}>
                     <div className="font-semibold text-[#0A5E5C]">
                       {msg.user}
                     </div>
@@ -148,7 +148,7 @@ export default function ViewerPage() {
               </ScrollArea>
 
               <form onSubmit={handleSendMessage} className="mt-4 flex gap-2">
-                <Input
+                <Textarea
                   placeholder="メッセージを入力..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
