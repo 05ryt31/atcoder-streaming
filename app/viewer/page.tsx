@@ -1,14 +1,9 @@
 "use client";
 
-import type React from "react";
-
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Code, Send } from "lucide-react";
 import { LiveCard } from '@/components/ui/LiveCard';
 import { Message } from "@/components/ui/props";
@@ -29,7 +24,7 @@ interface ProblemDetail {
   }>;
 }
 
-const roomId = 1; // ← 今は固定値。将来的に状態や選択から取得する
+const roomId = 1;
 
 export default function ViewerPage() {
   const router = useRouter();
@@ -49,7 +44,7 @@ export default function ViewerPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await fetchComments('https://mobpro-api.taketo-u.net/messages/1');
+      const result = await fetchComments("https://mobpro-api.taketo-u.net/messages/1");
       if (result && Array.isArray(result)) {
         setMessages(result);
       } else {
@@ -90,8 +85,11 @@ export default function ViewerPage() {
     e.preventDefault();
     if (!message.trim()) return;
   
+    // localStorageからユーザー名を取得。保存されていない場合はデフォルトで"匿名"とする
+    const currentUser = localStorage.getItem("username") || "匿名";
+  
     const newMessage = {
-      user: "視聴者", // 視聴者として送信
+      user: currentUser,
       message: message,
     };
   
@@ -132,15 +130,21 @@ export default function ViewerPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#f8f9fa] to-[#e9f2e9]">
-      <header className="bg-white border-b border-[#4D7C4D] p-4 shadow-sm">
+      <header className="bg-white border-b border-[#4D7C4D] p-2 shadow-sm">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
-            {/* ロゴの代わりにCSSで作成した円形を使用 */}
-            <div className="w-10 h-10 bg-[#4D7C4D] rounded-full flex items-center justify-center text-white font-bold text-lg">
-              A
-            </div>
-            <h1 className="text-xl font-bold text-[#4D7C4D]">
-              アンタオサウルス
+            <Image
+              src="/images/logo.png"
+              alt="アンタオサウルス"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+            <h1 className="text-[min(9vw,60px)] font-bold text-[#4D7C4D]">
+              Live Coders
+              <span className="block mt-1 text-[min(2vw,20px)] text-gray-600">
+                視聴者ーモード
+              </span>
             </h1>
           </div>
           <Button
@@ -213,6 +217,14 @@ export default function ViewerPage() {
               </form>
             </CardContent>
           </Card>
+          {/* CommentCard にユーザー名が含まれたコメントを反映させる */}
+          <CommentCard
+            messages={messages}
+            message={message}
+            setMessage={setMessage}
+            handleSendMessage={handleSendMessage}
+            showHeart={true}
+          />
         </div>
       </main>
 
