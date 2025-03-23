@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,7 +21,8 @@ import { Send, Video, Users } from "lucide-react";
 import { LiveCard } from '@/components/ui/LiveCard'; // LiveCard コンポーネントをインポート
 import { Message } from "@/components/ui/props";
 import { fetchComments } from "@/handlers/fetchComments";
-import ProblemContent from "@/components/ui/problem-content"
+import ProblemContent from "@/components/ui/problem-content";
+import CommentCard from "@/components/ui/CommentCard"
 
 
 interface Problem {
@@ -204,7 +206,7 @@ export default function DriverPage() {
       setProblemUrl(url);
 
       setProblemStatement(
-        `https://atcoder.jp/contests/${contestId}/tasks/${problem.id}`
+        `https://atcoder.jp/contests/${problem.contest_id}/tasks/${problem.id}`
       );
 
       setMessages([
@@ -313,25 +315,6 @@ export default function DriverPage() {
     setIsLive(!isLive);
   };
 
-  // 問題の難易度に応じた色を返す
-  const getDifficultyColor = (difficulty: number | undefined) => {
-    if (!difficulty) return "text-gray-500";
-
-    if (difficulty < 400) return "text-gray-600";
-    if (difficulty < 800) return "text-brown-600";
-    if (difficulty < 1200) return "text-green-600";
-    if (difficulty < 1600) return "text-cyan-600";
-    if (difficulty < 2000) return "text-blue-600";
-    if (difficulty < 2400) return "text-yellow-600";
-    if (difficulty < 2800) return "text-orange-600";
-    return "text-red-600";
-  };
-
-  // 問題の難易度ラベルを生成
-  const getDifficultyLabel = (difficulty: number | undefined) => {
-    if (!difficulty) return "不明";
-    return Math.floor(difficulty).toString();
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#f8f9fa] to-[#e9f2e9]">
@@ -344,6 +327,7 @@ export default function DriverPage() {
               width={40}
               height={40}
               className="rounded-full"
+              priority
             />
             <h1 className="text-[min(9vw,60px)] font-bold text-[#4D7C4D]">
               Live Coders
@@ -442,7 +426,6 @@ export default function DriverPage() {
                 problemIndex={selectedProblem.problem_index}
               />
             </>
-
           )}
           <LiveCard showUpdateForm={true} showStopStreamingForm={true} />
         </div>
