@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CommentCard from "@/components/ui/CommentCard";
 import { Code, Send } from "lucide-react";
-import { LiveCard } from '@/components/ui/LiveCard';
-import { Message } from "@/components/ui/props";
+import { LiveCard } from "@/components/ui/LiveCard";
+import type { Message } from "@/components/ui/props";
 import { fetchComments } from "@/handlers/fetchComments";
 import ProblemContent from "@/components/ui/problem-content";
-import { ScrollArea } from "@/components/ui/scroll-area"; // Added this import
-import { Separator } from "@/components/ui/separator"; // Added this import
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import CommentCard from "@/components/ui/CommentCard";
 
 interface ProblemDetail {
   id: string;
@@ -30,6 +30,7 @@ interface ProblemDetail {
 }
 
 const roomId = 1;
+const currentUserId = 1;
 
 export default function ViewerPage() {
   const router = useRouter();
@@ -42,29 +43,27 @@ export default function ViewerPage() {
     contestId: string;
     problemIndex: string;
   } | null>(null);
-  
-  // 問題詳細の状態
   const [selectedProblem, setSelectedProblem] = useState<ProblemDetail | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // 初回および更新時にコメントデータを取得
   useEffect(() => {
     const fetchData = async () => {
-      const result = await fetchComments("https://mobpro-api.taketo-u.net/messages/1");
+      // GET リクエストの URL は末尾にスラッシュを追加して FastAPI 側に合わせる
+      const result = await fetchComments(`https://mobpro-api.taketo-u.net/messages/${roomId}/?user_id=${currentUserId}`);
       if (result && Array.isArray(result)) {
         setMessages(result);
       } else {
-        console.warn("コメントデータの取得に失敗したか、形式が不正です: ", result);
+        console.warn("コメントデータの取得に失敗または形式不正:", result);
       }
     };
     fetchData();
-    
-    // 問題詳細を取得する関数
+
+    // 問題詳細を取得（API 実装に合わせ適宜調整）
     const fetchCurrentProblem = async () => {
       try {
         setLoading(true);
-        // 実際の環境では、正しいエンドポイントに変更する必要があります
-        const response = await fetch('/api/current-problem');
-        
+        const response = await fetch("/api/current-problem");
         if (response.ok) {
           const data = await response.json();
           if (data.problem) {
@@ -78,54 +77,44 @@ export default function ViewerPage() {
         setLoading(false);
       }
     };
-    
     fetchCurrentProblem();
-    
     const intervalId = setInterval(fetchCurrentProblem, 30000);
-    
     return () => clearInterval(intervalId);
   }, []);
 
+  // コメント送信処理
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
-  
-    // localStorageからユーザー名を取得。保存されていない場合はデフォルトで"匿名"とする
     const currentUser = localStorage.getItem("username") || "匿名";
-  
-    const newMessage = {
-      user: currentUser,
-      message: message,
-    };
-  
+    const newMsg = { user: currentUser, message: message };
+
     try {
-      const res = await fetch(`https://mobpro-api.taketo-u.net/messages/make/${roomId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newMessage),
-      });
-  
-      if (!res.ok) {
-        throw new Error("コメント送信に失敗しました");
-      }
-  
+      const res = await fetch(
+        `https://mobpro-api.taketo-u.net/messages/make/${roomId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newMsg),
+        }
+      );
+      if (!res.ok) throw new Error("コメント送信に失敗しました");
       const savedMessage = await res.json();
-  
-      setMessages([...messages, {
-        user: savedMessage.user,
-        message: savedMessage.message
-      }]);
-  
-      setMessage(""); // 入力欄をクリア
-  
+      setMessages((prev) => [
+        ...prev,
+        {
+          user: savedMessage.user,
+          message: savedMessage.message,
+          message_id: savedMessage.id, // API のレスポンスに合わせる
+        },
+      ]);
+      setMessage("");
     } catch (error) {
-      console.error("コメントの送信に失敗しました:", error);
-      setMessages([...messages, {
-        user: "システム",
-        message: "コメントの送信に失敗しました。"
-      }]);
+      console.error("コメント送信に失敗:", error);
+      setMessages((prev) => [
+        ...prev,
+        { user: "システム", message: "コメント送信に失敗しました。", message_id: 0 },
+      ]);
     }
   };
 
@@ -160,15 +149,12 @@ export default function ViewerPage() {
           </Button>
         </div>
       </header>
-
       <main className="flex-1 container mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3 space-y-4">
           <LiveCard showUpdateForm={false} showStopStreamingForm={false} />
-          
-          {/* 問題内容表示コンポーネント */}
           {currentProblem ? (
             <div className="mt-4">
-              <ProblemContent 
+              <ProblemContent
                 problemId={currentProblem.id}
                 problemTitle={currentProblem.title}
                 problemUrl={currentProblem.url}
@@ -191,47 +177,18 @@ export default function ViewerPage() {
             </Card>
           )}
         </div>
-
         <div className="space-y-4 lg:col-span-1">
-          <Card className="border-[#B5D267]">
-            <CardHeader className="bg-[#4D7C4D] text-white pb-2">
-              <CardTitle className="text-lg">コメント</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <ScrollArea className="h-[500px] pr-4">
-                {messages.map((msg, index) => (
-                  <div key={index} className="mb-4">
-                    <div className="font-semibold text-[#0A5E5C]">{msg.user}</div>
-                    <div className="text-sm">{msg.message}</div>
-                    {index < messages.length - 1 && <Separator className="mt-2 bg-[#B5D267]" />}
-                  </div>
-                ))}
-              </ScrollArea>
-
-              <form onSubmit={handleSendMessage} className="mt-4 flex gap-2">
-                <Input
-                  placeholder="メッセージを入力..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="border-[#B5D267] focus-visible:ring-[#4D7C4D]"
-                />
-                <Button type="submit" size="icon" className="bg-[#FFBA0D] hover:bg-[#e6a700] text-white">
-                  <Send size={18} />
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-          {/* CommentCard にユーザー名が含まれたコメントを反映させる */}
+          {/* いいね機能付きコメントカード */}
           <CommentCard
             messages={messages}
             message={message}
             setMessage={setMessage}
             handleSendMessage={handleSendMessage}
-            showHeart={true}
+            roomId={roomId}
+            currentUserId={currentUserId}
           />
         </div>
       </main>
-
       <footer className="bg-white border-t border-[#4D7C4D] p-4 text-center text-sm text-[#4D7C4D]">
         アンタオサウルス © 2025
       </footer>

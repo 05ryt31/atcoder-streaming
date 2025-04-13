@@ -1,4 +1,5 @@
 export interface Message {
-    user: string;
-    message: string;
-  }
+  message_id: number; // API から返されるメッセージ ID
+  user: string;
+  message: string;
+}
